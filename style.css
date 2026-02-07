@@ -36,18 +36,30 @@ body {
 }
 
 /* Header */
+/* Header */
 header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    /* Left button, Title centered, Right button */
     align-items: center;
     margin-bottom: 24px;
+    width: 100%;
 }
 
 h1 {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 700;
     margin: 0;
     letter-spacing: -0.5px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.header-left,
+.header-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .icon-btn {
@@ -140,7 +152,38 @@ h1 {
 .mode-btn:active {
     background-color: #F2F2F7;
     border-radius: 8px;
-    /* Visual fix for active state */
+}
+
+/* Updated Menu UI: Segmented Control */
+.segmented-control {
+    display: flex;
+    background-color: #E5E5EA;
+    /* iOS Segmented Control Bg */
+    border-radius: 9px;
+    padding: 2px;
+    margin-bottom: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.segment-btn {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 8px 16px;
+    border-radius: 7px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.segment-btn.active {
+    background-color: var(--card-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    font-weight: 600;
 }
 
 /* Flashcard Area */
@@ -192,10 +235,17 @@ h1 {
     background-color: #F9F9FB;
 }
 
+.card-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    gap: 10px;
+}
+
 .card-text {
     font-size: 32px;
     font-weight: 700;
-    margin-bottom: 8px;
 }
 
 .card-subtext {
@@ -253,6 +303,34 @@ h1 {
 .btn-next {
     background-color: var(--accent-color);
     color: white;
+}
+
+/* Audio Button */
+.audio-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    color: var(--accent-color);
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    /* Changed to inline-flex to center content */
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    /* Fixed size for easier clicking */
+    height: 44px;
+}
+
+.audio-btn:active {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: scale(0.95);
+}
+
+.audio-btn:hover {
+    background-color: rgba(0, 0, 0, 0.03);
 }
 
 /* Stat Bar */
@@ -335,15 +413,29 @@ h1 {
     width: 100%;
 }
 
-.quiz-question {
-    font-size: 32px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 24px;
+.quiz-question-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     background: var(--card-bg);
     padding: 32px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
+    margin-bottom: 24px;
+    flex-direction: row;
+    /* Ensure row layout */
+}
+
+.quiz-question {
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    margin: 0;
+    flex: 1;
+    /* Fix for visibility */
+    color: var(--text-color);
+    /* Ensure color */
 }
 
 .quiz-answers {
@@ -424,4 +516,14 @@ h1 {
     color: var(--accent-color);
     display: block;
     margin-bottom: 4px;
+}
+
+/* Force vertical stacking for answer buttons (Thai + Transliteration) */
+.answer-btn { 
+    flex-direction: column !important; 
+}
+
+.answer-btn span { 
+    display: block !important; 
+    width: 100%; 
 }

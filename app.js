@@ -2,10 +2,12 @@
 const el = {
     appTitle: document.getElementById('app-title'),
     langBtn: document.getElementById('lang-btn'),
+    btnHeaderHome: document.getElementById('btn-header-home'),
     screens: {
         menu: document.getElementById('screen-menu'),
         game: document.getElementById('screen-game'),
-        result: document.getElementById('screen-result')
+        result: document.getElementById('screen-result'),
+        quiz: document.getElementById('screen-quiz')
     },
     menu: {
         labelMode: document.getElementById('label-learning-mode'),
@@ -20,8 +22,8 @@ const el = {
         btnLevel: document.getElementById('btn-level-select'),
         levelDisplay: document.getElementById('level-display'),
         labelType: document.getElementById('label-type'),
-        btnType: document.getElementById('btn-type-select'),
-        typeDisplay: document.getElementById('type-display'),
+        segFlashcards: document.getElementById('seg-flashcards'),
+        segQuiz: document.getElementById('seg-quiz'),
         labelStats: document.getElementById('label-stats'),
         btnStats: document.getElementById('btn-open-stats')
     },
@@ -37,16 +39,20 @@ const el = {
         btnCorrect: document.getElementById('btn-correct'),
         btnHome: document.getElementById('btn-home'),
         controlsAnswer: document.getElementById('controls-answer'),
-        controlsNav: document.getElementById('controls-nav')
+        controlsNav: document.getElementById('controls-nav'),
+        btnAudioFront: document.getElementById('btn-audio-front'),
+        btnAudioBack: document.getElementById('btn-audio-back')
     },
     quiz: {
         screen: document.getElementById('screen-quiz'),
         progressBar: document.getElementById('progress-fill-quiz'),
         question: document.getElementById('quiz-question'),
+        subtext: document.getElementById('quiz-subtext'),
         options: document.getElementById('quiz-options'),
         controls: document.getElementById('controls-quiz-nav'),
         btnHome: document.getElementById('btn-quiz-home'),
-        btnNext: document.getElementById('btn-quiz-next')
+        btnNext: document.getElementById('btn-quiz-next'),
+        btnAudio: document.getElementById('btn-audio-quiz')
     },
     stats: {
         screen: document.getElementById('screen-stats'),
@@ -91,15 +97,24 @@ function bindEvents() {
     // Language Toggle
     el.langBtn.addEventListener('click', toggleLanguage);
 
+    // Header Home
+    if (el.btnHeaderHome) el.btnHeaderHome.addEventListener('click', showMenu);
+
     // Level Toggle
     if (el.menu.btnLevel) el.menu.btnLevel.addEventListener('click', toggleLevel);
 
-    // Type Toggle
-    if (el.menu.btnType) el.menu.btnType.addEventListener('click', toggleType);
+    // Type Toggle (Segmented Control)
+    if (el.menu.segFlashcards) el.menu.segFlashcards.addEventListener('click', () => setType('flashcards'));
+    if (el.menu.segQuiz) el.menu.segQuiz.addEventListener('click', () => setType('quiz'));
 
     // Stats
     if (el.menu.btnStats) el.menu.btnStats.addEventListener('click', showStats);
     if (el.stats.btnClose) el.stats.btnClose.addEventListener('click', showMenu);
+
+    // Audio Interactions
+    if (el.game.btnAudioFront) el.game.btnAudioFront.addEventListener('click', (e) => { e.stopPropagation(); playAudio('front'); });
+    if (el.game.btnAudioBack) el.game.btnAudioBack.addEventListener('click', (e) => { e.stopPropagation(); playAudio('back'); });
+    if (el.quiz.btnAudio) el.quiz.btnAudio.addEventListener('click', () => playAudio('quiz'));
 
     // Quiz Interactions
     if (el.quiz.btnNext) el.quiz.btnNext.addEventListener('click', nextCard);
@@ -154,16 +169,25 @@ function updateLevelDisplay() {
     }
 }
 
-function toggleType() {
-    state.learningType = state.learningType === 'flashcards' ? 'quiz' : 'flashcards';
+function setType(type) {
+    state.learningType = type;
     updateTypeDisplay();
 }
 
 function updateTypeDisplay() {
-    const t = UI_TEXTS[state.lang];
-    if (el.menu.typeDisplay) {
-        el.menu.typeDisplay.textContent = state.learningType === 'flashcards' ? t.type_flashcards : t.type_quiz;
+    // Update Segmented Control UI
+    if (state.learningType === 'flashcards') {
+        el.menu.segFlashcards.classList.add('active');
+        el.menu.segQuiz.classList.remove('active');
+    } else {
+        el.menu.segFlashcards.classList.remove('active');
+        el.menu.segQuiz.classList.add('active');
     }
+
+    // Also update button text if we still used the old button but we are not
+    const t = UI_TEXTS[state.lang];
+    if (el.menu.segFlashcards) el.menu.segFlashcards.textContent = t.type_flashcards;
+    if (el.menu.segQuiz) el.menu.segQuiz.textContent = t.type_quiz;
 }
 
 function updateUITexts() {
@@ -336,39 +360,133 @@ function nextCard() {
     }
 }
 
+// --- Audio Logic ---
+
+function playAudio(context) {
+    const item = state.deck[state.currentIndex];
+    const mode = state.mode;
+
+    let textToSpeak = "";
+    let lang = "th-TH"; // Default
+
+    // Determine what text is where
+    // Common checks for source/target based on mode
+    const isThaiSource = mode === 'th-de' || mode === 'th-en' || mode === 'review';
+    const isGermanTarget = mode === 'th-de' || mode === 'de-th' || mode === 'review';
+
+    if (context === 'quiz') {
+        // Question text
+        if (isThaiSource) {
+            textToSpeak = item.thai;
+            lang = "th-TH";
+        } else {
+            textToSpeak = isGermanTarget ? item.german : item.english;
+            lang = isGermanTarget ? "de-DE" : "en-US";
+        }
+    } else if (context === 'front') {
+        if (isThaiSource) {
+            textToSpeak = item.thai;
+            lang = "th-TH";
+        } else {
+            textToSpeak = isGermanTarget ? item.german : item.english;
+            lang = isGermanTarget ? "de-DE" : "en-US";
+        }
+    } else if (context === 'back') {
+        // Opposite of front
+        if (isThaiSource) {
+            // Front was Thai, so back is Target
+            textToSpeak = isGermanTarget ? item.german : item.english;
+            lang = isGermanTarget ? "de-DE" : "en-US";
+        } else {
+            // Front was Target, so back is Thai
+            textToSpeak = item.thai;
+            lang = "th-TH";
+        }
+    }
+
+    if (!textToSpeak) return;
+
+    // Web Speech API
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = lang;
+    utterance.rate = 0.9; // Slightly slower for better clarity
+    window.speechSynthesis.speak(utterance);
+}
+
 // --- Quiz Logic ---
 
 function renderQuizQuestion() {
     const item = state.deck[state.currentIndex];
     const mode = state.mode;
 
+    console.log("Rendering Quiz Question:", { index: state.currentIndex, item, mode });
+
+    // Safety check
+    if (!item) {
+        console.error("Quiz Error: Item is undefined", state.currentIndex);
+        el.quiz.question.textContent = "Error: Item Missing";
+        return;
+    }
+
     // Setup question text similar to flashcard front
-    let questionText;
-    let targetKey;
+    let questionText = "";
+    let questionSub = "";
+    let targetKey = "english";
 
     const isThaiSource = mode === 'th-de' || mode === 'th-en' || mode === 'review';
     const isGermanTarget = mode === 'th-de' || mode === 'de-th' || mode === 'review';
 
     if (isThaiSource) {
         questionText = item.thai;
+        questionSub = item.transliteration || "";
         targetKey = isGermanTarget ? 'german' : 'english';
     } else {
         questionText = isGermanTarget ? item.german : item.english;
+        // Optional: If you want to show Thai subtext when asking in German, uncomment below
+        // questionSub = ""; 
         targetKey = 'thai';
     }
 
+    // Fallback if text is missing
+    if (!questionText) {
+        console.warn("Quiz Warning: Text missing for item", item);
+        questionText = "???";
+    }
+
+    console.log("Quiz Render:", { text: questionText, sub: questionSub });
     el.quiz.question.textContent = questionText;
+    el.quiz.subtext.textContent = questionSub;
 
     // Generate Options
     const correctAnswer = item[targetKey];
-    let options = [correctAnswer];
+    if (!correctAnswer) {
+        console.error("Quiz Error: Target missing", item);
+        return;
+    }
+
+    // Determine if we need subtext for answers (only if answers are Thai)
+    const showAnswerSub = (targetKey === 'thai');
+
+    // Create option objects: { text, sub, isCorrect }
+    let options = [{
+        text: correctAnswer,
+        sub: showAnswerSub ? item.transliteration : null,
+        isCorrect: true
+    }];
 
     // Get 3 distractors
     const pool = vocabList.filter(v => v.id !== item.id && v[targetKey]);
     for (let i = 0; i < 3; i++) {
         if (pool.length > 0) {
             const randIdx = Math.floor(Math.random() * pool.length);
-            options.push(pool[randIdx][targetKey]);
+            const distractor = pool[randIdx];
+
+            options.push({
+                text: distractor[targetKey],
+                sub: showAnswerSub ? distractor.transliteration : null,
+                isCorrect: false
+            });
+
             pool.splice(randIdx, 1);
         }
     }
@@ -380,8 +498,15 @@ function renderQuizQuestion() {
     options.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'answer-btn';
-        btn.textContent = opt;
-        btn.onclick = () => checkQuizAnswer(btn, opt === correctAnswer, item.id);
+
+        // Render content: Main text + Optional subtext
+        let html = `<span class="btn-text">${opt.text}</span>`;
+        if (opt.sub) {
+            html += `<span class="btn-sub">${opt.sub}</span>`;
+        }
+        btn.innerHTML = html;
+
+        btn.onclick = () => checkQuizAnswer(btn, opt.isCorrect, item.id);
         el.quiz.options.appendChild(btn);
     });
 
@@ -404,9 +529,7 @@ function checkQuizAnswer(btn, isCorrect, itemId) {
         state.stats.wrong++;
         state.history[itemId] = 'unknown';
 
-        // Find correct button to highlight green
-        // We need to find which button has the correct text. 
-        // We don't store "correct answer" easily here, but we can re-derive or pass it.
+        // Find correct button to highlight green?
         // For now just show Next.
         el.quiz.controls.classList.remove('hidden');
     }
