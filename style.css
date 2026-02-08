@@ -110,8 +110,18 @@ h1 {
 .menu-group {
     background-color: var(--card-bg);
     border-radius: var(--radius-lg);
-    padding: 10px;
+    padding: 0; /* Remove padding to match iOS list style */
     box-shadow: var(--shadow-sm);
+    overflow: hidden; /* For border radius */
+}
+
+/* Grid layout for Learning Direction */
+.menu-group.grid-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px; /* Gap for border effect */
+    background-color: #E5E5EA; /* Color of the gap/border */
+    padding: 0;
 }
 
 .menu-label {
@@ -127,7 +137,7 @@ h1 {
 .mode-btn {
     width: 100%;
     text-align: left;
-    background: none;
+    background: var(--card-bg);
     border: none;
     padding: 16px;
     font-size: 17px;
@@ -137,6 +147,18 @@ h1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+/* Specific styling for grid buttons */
+.menu-group.grid-buttons .mode-btn {
+    border-bottom: none;
+    justify-content: center; /* Center content */
+    text-align: center;
+}
+
+/* Remove chevron for grid buttons */
+.menu-group.grid-buttons .mode-btn:after {
+    content: none;
 }
 
 .mode-btn:last-child {

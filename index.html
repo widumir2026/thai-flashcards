@@ -25,22 +25,9 @@
         <!-- MENU SCREEN -->
         <div id="screen-menu" class="screen active">
 
-            <!-- Type Selection (Card vs Quiz) -->
-            <div class="menu-label" id="label-type">Modus</div>
-            <div class="segmented-control">
-                <button class="segment-btn active" id="seg-flashcards" data-type="flashcards">Karteikarten</button>
-                <button class="segment-btn" id="seg-quiz" data-type="quiz">Quiz</button>
-            </div>
-
-            <div class="menu-label" id="label-level">Schwierigkeitsgrad</div>
-            <div class="menu-group">
-                <button class="mode-btn" id="btn-level-select">
-                    <span id="level-display">Alle Levels</span>
-                </button>
-            </div>
-
+            <!-- 1. Learning Direction -->
             <div class="menu-label" id="label-learning-mode">Lernrichtung</div>
-            <div class="menu-group">
+            <div class="menu-group grid-buttons">
                 <button class="mode-btn" data-mode="th-de">
                     <span id="btn-th-de">Thai → Deutsch</span>
                 </button>
@@ -53,6 +40,21 @@
                 <button class="mode-btn" data-mode="en-th">
                     <span id="btn-en-th">Englisch → Thai</span>
                 </button>
+            </div>
+
+            <!-- 2. Difficulty Level -->
+            <div class="menu-label" id="label-level">Schwierigkeitsgrad</div>
+            <div class="menu-group">
+                <button class="mode-btn" id="btn-level-select">
+                    <span id="level-display">Alle Levels</span>
+                </button>
+            </div>
+
+            <!-- 3. Type Selection (Card vs Quiz) -->
+            <div class="menu-label" id="label-type">Modus</div>
+            <div class="segmented-control">
+                <button class="segment-btn active" id="seg-flashcards" data-type="flashcards">Karteikarten</button>
+                <button class="segment-btn" id="seg-quiz" data-type="quiz">Quiz</button>
             </div>
 
             <div class="menu-label" id="label-review">Review</div>

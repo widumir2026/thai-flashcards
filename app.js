@@ -362,6 +362,26 @@ function nextCard() {
 
 // --- Audio Logic ---
 
+function speakText(text, lang) {
+    if (!text) return;
+    // Check supported voices
+    // const voices = window.speechSynthesis.getVoices();
+    // console.log("Available voices:", voices.map(v => `${v.name} (${v.lang})`));
+
+    // Cancel current speech to avoid queue buildup
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.rate = 0.9;
+
+    // utterance.onstart = () => console.log("Audio started");
+    // utterance.onend = () => console.log("Audio finished");
+    // utterance.onerror = (e) => console.error("Audio error:", e);
+
+    window.speechSynthesis.speak(utterance);
+}
+
 function playAudio(context) {
     const item = state.deck[state.currentIndex];
     const mode = state.mode;
@@ -404,13 +424,7 @@ function playAudio(context) {
         }
     }
 
-    if (!textToSpeak) return;
-
-    // Web Speech API
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = lang;
-    utterance.rate = 0.9; // Slightly slower for better clarity
-    window.speechSynthesis.speak(utterance);
+    speakText(textToSpeak, lang);
 }
 
 // --- Quiz Logic ---
@@ -506,7 +520,15 @@ function renderQuizQuestion() {
         }
         btn.innerHTML = html;
 
-        btn.onclick = () => checkQuizAnswer(btn, opt.isCorrect, item.id);
+        // Determine language for this option
+        let optLang = 'th-TH'; // default
+        if (targetKey === 'german') optLang = 'de-DE';
+        if (targetKey === 'english') optLang = 'en-US';
+
+        btn.onclick = () => {
+            speakText(opt.text, optLang);
+            checkQuizAnswer(btn, opt.isCorrect, item.id);
+        };
         el.quiz.options.appendChild(btn);
     });
 
