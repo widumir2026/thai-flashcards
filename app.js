@@ -7,7 +7,8 @@ const el = {
         menu: document.getElementById('screen-menu'),
         game: document.getElementById('screen-game'),
         result: document.getElementById('screen-result'),
-        quiz: document.getElementById('screen-quiz')
+        quiz: document.getElementById('screen-quiz'),
+        stats: document.getElementById('screen-stats')
     },
     menu: {
         labelMode: document.getElementById('label-learning-mode'),
@@ -149,7 +150,7 @@ function toggleLanguage() {
 }
 
 function toggleLevel() {
-    const levels = ['all', 'A1', 'A2', 'Everyday'];
+    const levels = ['all', 'A1', 'A2', 'Everyday', 'Numbers'];
     let idx = levels.indexOf(state.currentLevel);
     idx = (idx + 1) % levels.length;
     state.currentLevel = levels[idx];
@@ -162,7 +163,8 @@ function updateLevelDisplay() {
         'all': t.level_all,
         'A1': t.level_a1,
         'A2': t.level_a2,
-        'Everyday': t.level_everyday
+        'Everyday': t.level_everyday,
+        'Numbers': t.level_numbers
     };
     if (el.menu.levelDisplay) {
         el.menu.levelDisplay.textContent = map[state.currentLevel];
@@ -196,14 +198,15 @@ function updateUITexts() {
     el.langBtn.textContent = state.lang === 'de' ? '🇩🇪' : '🇹🇭';
 
     // Menu
-    el.menu.labelMode.textContent = t.mode_label;
-    el.menu.btnThDe.textContent = t.mode_th_de;
-    el.menu.btnDeTh.textContent = t.mode_de_th;
-    el.menu.btnThEn.textContent = t.mode_th_en;
-    el.menu.btnEnTh.textContent = t.mode_en_th;
-    el.menu.labelReview.textContent = t.mode_review;
-    el.menu.btnReview.textContent = t.mode_review;
-    el.menu.btnReset.textContent = t.reset_progress;
+    if (el.menu.labelMode) el.menu.labelMode.textContent = t.mode_label;
+    if (el.menu.btnThDe) el.menu.btnThDe.textContent = t.mode_th_de;
+    if (el.menu.btnDeTh) el.menu.btnDeTh.textContent = t.mode_de_th;
+    if (el.menu.btnThEn) el.menu.btnThEn.textContent = t.mode_th_en;
+    if (el.menu.btnEnTh) el.menu.btnEnTh.textContent = t.mode_en_th;
+
+    if (el.menu.labelReview) el.menu.labelReview.textContent = t.mode_review;
+    if (el.menu.btnReview) el.menu.btnReview.textContent = t.mode_review;
+    if (el.menu.btnReset) el.menu.btnReset.textContent = t.reset_progress;
 
     if (el.menu.labelLevel) el.menu.labelLevel.textContent = t.level_label;
     if (el.menu.labelType) el.menu.labelType.textContent = t.type_label;
@@ -527,7 +530,7 @@ function renderQuizQuestion() {
 
         btn.onclick = () => {
             speakText(opt.text, optLang);
-            checkQuizAnswer(btn, opt.isCorrect, item.id);
+            checkQuizAnswer(btn, opt.isCorrect, item.id, correctAnswer);
         };
         el.quiz.options.appendChild(btn);
     });
@@ -535,7 +538,7 @@ function renderQuizQuestion() {
     el.quiz.controls.classList.add('hidden');
 }
 
-function checkQuizAnswer(btn, isCorrect, itemId) {
+function checkQuizAnswer(btn, isCorrect, itemId, correctAnswer) {
     // Disable all buttons
     const buttons = el.quiz.options.querySelectorAll('button');
     buttons.forEach(b => b.disabled = true);
@@ -546,7 +549,17 @@ function checkQuizAnswer(btn, isCorrect, itemId) {
         state.history[itemId] = 'known';
         el.quiz.controls.classList.remove('hidden');
     } else {
+        // Wrong
         btn.classList.add('wrong');
+        // Find and highlight correct answer
+        buttons.forEach(button => { // Renamed 'btn' to 'button' to avoid conflict with parameter
+            // Check if the button's main text content matches the correct answer
+            // Using textContent directly might include subtext, so check the span specifically
+            const btnTextSpan = button.querySelector('.btn-text');
+            if (btnTextSpan && btnTextSpan.textContent === correctAnswer) {
+                button.classList.add('correct-border');
+            }
+        });
         // meaningful feedback: highlight correct one
         state.stats.wrong++;
         state.history[itemId] = 'unknown';
@@ -564,7 +577,7 @@ function showStats() {
     showScreen('stats');
 
     // Calculate stats per level
-    const levels = ['A1', 'A2', 'Everyday'];
+    const levels = ['A1', 'A2', 'Everyday', 'Numbers'];
     const container = el.stats.container;
     container.innerHTML = '';
 

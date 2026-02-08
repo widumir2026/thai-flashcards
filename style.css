@@ -110,17 +110,21 @@ h1 {
 .menu-group {
     background-color: var(--card-bg);
     border-radius: var(--radius-lg);
-    padding: 0; /* Remove padding to match iOS list style */
+    padding: 0;
+    /* Remove padding to match iOS list style */
     box-shadow: var(--shadow-sm);
-    overflow: hidden; /* For border radius */
+    overflow: hidden;
+    /* For border radius */
 }
 
 /* Grid layout for Learning Direction */
 .menu-group.grid-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1px; /* Gap for border effect */
-    background-color: #E5E5EA; /* Color of the gap/border */
+    gap: 1px;
+    /* Gap for border effect */
+    background-color: #E5E5EA;
+    /* Color of the gap/border */
     padding: 0;
 }
 
@@ -152,7 +156,8 @@ h1 {
 /* Specific styling for grid buttons */
 .menu-group.grid-buttons .mode-btn {
     border-bottom: none;
-    justify-content: center; /* Center content */
+    justify-content: center;
+    /* Center content */
     text-align: center;
 }
 
@@ -495,6 +500,12 @@ h1 {
     opacity: 0.6;
 }
 
+.answer-btn.correct-border {
+    border: 3px solid var(--success-color);
+    box-sizing: border-box;
+    font-weight: 700;
+}
+
 /* Stats Screen */
 .stats-header {
     text-align: center;
@@ -541,11 +552,11 @@ h1 {
 }
 
 /* Force vertical stacking for answer buttons (Thai + Transliteration) */
-.answer-btn { 
-    flex-direction: column !important; 
+.answer-btn {
+    flex-direction: column !important;
 }
 
-.answer-btn span { 
-    display: block !important; 
-    width: 100%; 
+.answer-btn span {
+    display: block !important;
+    width: 100%;
 }
