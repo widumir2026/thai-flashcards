@@ -693,5 +693,31 @@ function updateThemeIcon() {
     }
 }
 
+// Theme Functions
+function initTheme() {
+    if (state.darkMode) {
+        document.body.classList.add('dark-mode');
+    }
+    updateThemeIcon();
+}
+
+function toggleTheme() {
+    state.darkMode = !state.darkMode;
+    if (state.darkMode) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('thaiApp_darkMode', 'true');
+    } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('thaiApp_darkMode', 'false');
+    }
+    updateThemeIcon();
+}
+
+function updateThemeIcon() {
+    if (el.btnTheme) {
+        el.btnTheme.textContent = state.darkMode ? '☀️' : '🌙';
+    }
+}
+
 // Start
 init();
