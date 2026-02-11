@@ -2,6 +2,7 @@
 const el = {
     appTitle: document.getElementById('app-title'),
     langBtn: document.getElementById('lang-btn'),
+    btnTheme: document.getElementById('theme-btn'),
     btnHeaderHome: document.getElementById('btn-header-home'),
     screens: {
         menu: document.getElementById('screen-menu'),
@@ -81,13 +82,14 @@ const state = {
     currentIndex: 0,
     stats: { correct: 0, wrong: 0 },
     history: JSON.parse(localStorage.getItem('thaiApp_history')) || {},
-    currentLevel: 'all', // 'all', 'A1', 'A2', 'Everyday'
-    learningType: 'flashcards' // 'flashcards' or 'quiz'
+    learningType: 'flashcards', // 'flashcards' or 'quiz'
+    darkMode: localStorage.getItem('thaiApp_darkMode') === 'true'
 };
 
 // --- Initialization ---
 
 function init() {
+    initTheme();
     updateUITexts();
     updateLevelDisplay();
     updateTypeDisplay();
@@ -97,6 +99,9 @@ function init() {
 function bindEvents() {
     // Language Toggle
     el.langBtn.addEventListener('click', toggleLanguage);
+
+    // Theme Toggle
+    if (el.btnTheme) el.btnTheme.addEventListener('click', toggleTheme);
 
     // Header Home
     if (el.btnHeaderHome) el.btnHeaderHome.addEventListener('click', showMenu);
@@ -126,8 +131,12 @@ function bindEvents() {
         btn.addEventListener('click', () => startMode(btn.dataset.mode));
     });
 
-    document.getElementById('btn-review-errors').addEventListener('click', startReviewMode);
-    document.getElementById('btn-reset').addEventListener('click', resetProgress);
+    if (document.getElementById('btn-review-errors')) {
+        document.getElementById('btn-review-errors').addEventListener('click', startReviewMode);
+    }
+    if (document.getElementById('btn-reset')) {
+        document.getElementById('btn-reset').addEventListener('click', resetProgress);
+    }
 
     // Game Interactions
     el.game.card.addEventListener('click', flipCard);
@@ -655,6 +664,33 @@ function shuffleDeck(array) {
 
 function showMenu() {
     showScreen('menu');
+}
+
+// Start
+// Theme Functions
+function initTheme() {
+    if (state.darkMode) {
+        document.body.classList.add('dark-mode');
+    }
+    updateThemeIcon();
+}
+
+function toggleTheme() {
+    state.darkMode = !state.darkMode;
+    if (state.darkMode) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('thaiApp_darkMode', 'true');
+    } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('thaiApp_darkMode', 'false');
+    }
+    updateThemeIcon();
+}
+
+function updateThemeIcon() {
+    if (el.btnTheme) {
+        el.btnTheme.textContent = state.darkMode ? '☀️' : '🌙';
+    }
 }
 
 // Start

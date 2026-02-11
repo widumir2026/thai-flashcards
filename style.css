@@ -16,6 +16,16 @@
     --transition-speed: 0.4s;
 }
 
+body.dark-mode {
+    --bg-color: #000000;
+    --card-bg: #1C1C1E;
+    --text-color: #FFFFFF;
+    --text-secondary: #8E8E93;
+    --shadow-sm: 0 2px 5px rgba(255, 255, 255, 0.05);
+    --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.3);
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
