@@ -82,6 +82,7 @@ const state = {
     currentIndex: 0,
     stats: { correct: 0, wrong: 0 },
     history: JSON.parse(localStorage.getItem('thaiApp_history')) || {},
+    currentLevel: 'all', // Default: All Levels
     learningType: 'flashcards', // 'flashcards' or 'quiz'
     darkMode: localStorage.getItem('thaiApp_darkMode') === 'true'
 };
@@ -159,7 +160,7 @@ function toggleLanguage() {
 }
 
 function toggleLevel() {
-    const levels = ['all', 'A1', 'A2', 'Everyday', 'Numbers'];
+    const levels = ['all', 'A1', 'A2', 'Everyday', 'Numbers', 'B1', 'B2', 'C1', 'C2'];
     let idx = levels.indexOf(state.currentLevel);
     idx = (idx + 1) % levels.length;
     state.currentLevel = levels[idx];
@@ -173,7 +174,11 @@ function updateLevelDisplay() {
         'A1': t.level_a1,
         'A2': t.level_a2,
         'Everyday': t.level_everyday,
-        'Numbers': t.level_numbers
+        'Numbers': t.level_numbers,
+        'B1': t.level_b1,
+        'B2': t.level_b2,
+        'C1': t.level_c1,
+        'C2': t.level_c2
     };
     if (el.menu.levelDisplay) {
         el.menu.levelDisplay.textContent = map[state.currentLevel];
@@ -229,7 +234,11 @@ function updateUITexts() {
     el.game.hint.textContent = t.flip_hint;
     el.game.btnCorrect.textContent = t.btn_correct;
     el.game.btnWrong.textContent = t.btn_wrong;
-    el.game.btnHome.textContent = t.restart_btn;
+    el.game.btnHome.textContent = t.btn_menu;
+
+    // Quiz
+    if (el.quiz.btnHome) el.quiz.btnHome.textContent = t.btn_menu;
+    if (el.quiz.btnNext) el.quiz.btnNext.textContent = t.btn_next;
 
     // Result
     el.result.title.textContent = t.completed_title;
@@ -586,7 +595,8 @@ function showStats() {
     showScreen('stats');
 
     // Calculate stats per level
-    const levels = ['A1', 'A2', 'Everyday', 'Numbers'];
+    // Calculate stats per level
+    const levels = ['A1', 'A2', 'Everyday', 'Numbers', 'B1', 'B2', 'C1', 'C2'];
     const container = el.stats.container;
     container.innerHTML = '';
 

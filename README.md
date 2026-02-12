@@ -6,9 +6,15 @@ Eine moderne Web-App zum Lernen von Thai-Vokabeln im eleganten Apple-Design.
 - **Apple-Style Design**: Clean, minimalistisch und responsiv.
 - **Bilingual**: Interface umschaltbar zwischen Deutsch und Thai.
 - **Lernmodi**: 
-  - Thai ↔ Deutsch
-  - Thai ↔ Englisch
-- **Intelligent**: Speichert den Lernfortschritt und bietet einen Modus zum Wiederholen von Fehlern.
+  - **Karteikarten**: Klassisches Lernen (Vorderseite/Rückseite).
+  - **Quiz**: Multiple Choice Test mit sofortigem Feedback.
+- **Levels**: Umfassende Vokabelsammlung von A1 bis C2 + Alltag & Zahlen.
+- **Features**:
+  - 🔊 **Audio**: Aussprache für jedes Wort.
+  - 🌙 **Dark Mode**: Augenschonend für Nachteulen.
+  - 📊 **Statistik**: Detaillierte Fortschrittsverfolgung pro Level.
+  - 🔁 **Fehler-Wiederholung**: Gezieltes Üben von schwierigen Wörtern.
+
 
 ## Nutzung
 

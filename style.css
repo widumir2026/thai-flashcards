@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 :root {
     --bg-color: #F5F5F7;
     --card-bg: #FFFFFF;
@@ -47,18 +51,33 @@ body {
 
 /* Header */
 /* Header */
+/* Header */
 header {
     display: grid;
-    grid-template-columns: 44px 1fr 44px;
-    /* Left button, Title centered, Right button */
+    grid-template-columns: 44px 1fr auto;
+    /* Changed right col to auto to fit buttons */
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     width: 100%;
+
+    /* Background Image */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('header_bg.png');
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--radius-lg);
+    padding: 60px 16px;
+    /* Increased padding from ~20px total height to ~120px + content */
+    box-shadow: var(--shadow-md);
+    color: white;
+    /* Text color for title */
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    /* Shadow for legibility */
 }
 
 h1 {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 28px;
+    /* Slightly larger */
+    font-weight: 800;
     margin: 0;
     letter-spacing: -0.5px;
     text-align: center;
@@ -70,26 +89,38 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 12px;
+    /* Space between buttons if multiple */
 }
 
 .icon-btn {
-    background: none;
+    background: rgba(255, 255, 255, 0.9);
+    /* Semi-transparent white backing */
     border: none;
-    font-size: 24px;
+    font-size: 22px;
     cursor: pointer;
-    background-color: var(--card-bg);
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    box-shadow: var(--shadow-sm);
+    /* Ensuring completely round */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: transform 0.2s;
+    transition: transform 0.2s, background-color 0.2s;
+    backdrop-filter: blur(4px);
+    overflow: hidden;
+    /* Clips content to circle */
 }
 
 .icon-btn:active {
     transform: scale(0.95);
+}
+
+/* Dark mode adjustments for header if needed, but image stays */
+body.dark-mode .icon-btn {
+    background: rgba(30, 30, 30, 0.8);
+    color: white;
 }
 
 /* Screens */
@@ -125,6 +156,10 @@ h1 {
     box-shadow: var(--shadow-sm);
     overflow: hidden;
     /* For border radius */
+}
+
+.menu-group:last-child {
+    margin-bottom: 0;
 }
 
 /* Grid layout for Learning Direction */
@@ -198,7 +233,6 @@ h1 {
     /* iOS Segmented Control Bg */
     border-radius: 9px;
     padding: 2px;
-    margin-bottom: 24px;
     width: 100%;
     box-sizing: border-box;
 }
