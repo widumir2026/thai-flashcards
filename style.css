@@ -271,10 +271,24 @@ body.dark-mode .icon-btn {
     text-align: center;
 }
 
+/* Force black text for inactive buttons in dark mode because background is light */
+.dark-mode .segment-btn {
+    color: #000000;
+}
+
 .segment-btn.active {
     background-color: var(--card-bg);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     font-weight: 600;
+}
+
+/* Active button in dark mode should follow normal text color (white) if bg is dark, 
+   BUT the segment background is #E5E5EA (light). 
+   The active button gets var(--card-bg) which is dark in dark mode (#1C1C1E).
+   So active button text should be white. Inactive should be black. */
+.dark-mode .segment-btn.active {
+    color: var(--text-color);
+    /* White */
 }
 
 /* Flashcard Area */
