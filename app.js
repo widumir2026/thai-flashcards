@@ -25,6 +25,7 @@ const el = {
         levelDisplay: document.getElementById('level-display'),
         labelType: document.getElementById('label-type'),
         segFlashcards: document.getElementById('seg-flashcards'),
+        segSentence: document.getElementById('seg-sentence'), // New button
         segQuiz: document.getElementById('seg-quiz'),
         labelStats: document.getElementById('label-stats'),
         btnStats: document.getElementById('btn-open-stats')
@@ -92,9 +93,36 @@ const state = {
 function init() {
     initTheme();
     updateUITexts();
-    updateLevelDisplay();
+    // Initial Type Display
     updateTypeDisplay();
+    // Initial UI Text Update
+    updateUITexts();
+
+    // Force language update for segmented control on init
+    const t = UI_TEXTS[state.lang];
+    if (el.menu.segFlashcards) el.menu.segFlashcards.textContent = t.type_flashcards;
+    if (el.menu.segSentence) el.menu.segSentence.textContent = t.type_sentence;
+    if (el.menu.segQuiz) el.menu.segQuiz.textContent = t.type_quiz;
+
+    // Load State
+    loadState();
     bindEvents();
+}
+
+function loadState() {
+    // Current Level
+    const savedLevel = localStorage.getItem('thaiApp_level');
+    if (savedLevel) {
+        state.currentLevel = savedLevel;
+        updateLevelDisplay();
+    }
+
+    // Learning Type (Segmented Control)
+    const savedType = localStorage.getItem('thaiApp_type');
+    if (savedType) {
+        state.learningType = savedType;
+        updateTypeDisplay();
+    }
 }
 
 function bindEvents() {
@@ -112,6 +140,7 @@ function bindEvents() {
 
     // Type Toggle (Segmented Control)
     if (el.menu.segFlashcards) el.menu.segFlashcards.addEventListener('click', () => setType('flashcards'));
+    if (el.menu.segSentence) el.menu.segSentence.addEventListener('click', () => setType('sentence'));
     if (el.menu.segQuiz) el.menu.segQuiz.addEventListener('click', () => setType('quiz'));
 
     // Stats
@@ -192,17 +221,23 @@ function setType(type) {
 
 function updateTypeDisplay() {
     // Update Segmented Control UI
+    // Update Segmented Control UI
+    if (el.menu.segFlashcards) el.menu.segFlashcards.classList.remove('active');
+    if (el.menu.segSentence) el.menu.segSentence.classList.remove('active');
+    if (el.menu.segQuiz) el.menu.segQuiz.classList.remove('active');
+
     if (state.learningType === 'flashcards') {
-        el.menu.segFlashcards.classList.add('active');
-        el.menu.segQuiz.classList.remove('active');
+        if (el.menu.segFlashcards) el.menu.segFlashcards.classList.add('active');
+    } else if (state.learningType === 'sentence') {
+        if (el.menu.segSentence) el.menu.segSentence.classList.add('active');
     } else {
-        el.menu.segFlashcards.classList.remove('active');
-        el.menu.segQuiz.classList.add('active');
+        if (el.menu.segQuiz) el.menu.segQuiz.classList.add('active');
     }
 
     // Also update button text if we still used the old button but we are not
     const t = UI_TEXTS[state.lang];
     if (el.menu.segFlashcards) el.menu.segFlashcards.textContent = t.type_flashcards;
+    if (el.menu.segSentence) el.menu.segSentence.textContent = t.type_sentence;
     if (el.menu.segQuiz) el.menu.segQuiz.textContent = t.type_quiz;
 }
 
@@ -252,10 +287,21 @@ function updateUITexts() {
 }
 
 function getFilteredDeck() {
-    if (state.currentLevel === 'all') {
-        return vocabList;
+    let list = vocabList;
+
+    // Filter by Type (Sentence vs Words)
+    if (state.learningType === 'sentence') {
+        list = list.filter(item => item.type === 'sentence');
+    } else {
+        // Exclude sentences for normal flashcards/quiz
+        list = list.filter(item => item.type !== 'sentence');
     }
-    return vocabList.filter(item => item.level === state.currentLevel);
+
+    // Filter by Level
+    if (state.currentLevel !== 'all') {
+        list = list.filter(item => item.level === state.currentLevel);
+    }
+    return list;
 }
 
 function startMode(mode) {
@@ -338,6 +384,44 @@ function renderCard() {
     el.game.frontSub.textContent = frontSub;
     el.game.backText.textContent = backMain;
     el.game.backSub.textContent = backSub;
+
+    const translitContainer = document.getElementById('back-translit');
+    if (translitContainer) {
+        // Only show transliteration on back if it's NOT already in backSub
+        // In th-de/th-en mode, backSub is English/German. Transliteration is missing.
+        // In de-th/en-th mode, backSub IS Transliteration.
+        if (mode.startsWith('th') || mode === 'review') {
+            translitContainer.textContent = item.transliteration || "";
+        } else {
+            translitContainer.textContent = "";
+        }
+    }
+
+    // Snippets Logic (Sentence Mode)
+    const snippetsContainer = document.getElementById('back-snippets');
+    if (snippetsContainer) {
+        snippetsContainer.innerHTML = ''; // Clear previous
+        if (item.type === 'sentence' && item.snippets) {
+            // Show snippets on the BACK side (Target side) for breakdown?
+            // User requested "snippet breakdowns".
+            // Since front is the Sentence (Thai), back is meaning. 
+            // Breakdowns help understand the Thai sentence structure.
+            // So they could be on BACK (explanation).
+            // But if learning "De -> Th", snippets help produce the Thai.
+
+            // Let's show snippets on the BACK always for now as explanation.
+            item.snippets.forEach(word => {
+                const chip = document.createElement('span');
+                chip.className = 'snippet-chip';
+                chip.textContent = word;
+                snippetsContainer.appendChild(chip);
+            });
+            // Add identifying class for styling
+            el.game.card.classList.add('sentence-card');
+        } else {
+            el.game.card.classList.remove('sentence-card');
+        }
+    }
 
     // Reset Flip
     el.game.card.classList.remove('flipped');
@@ -704,5 +788,6 @@ function updateThemeIcon() {
     }
 }
 
+// Start
 // Start
 init();

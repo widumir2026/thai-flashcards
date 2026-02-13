@@ -53,11 +53,12 @@ body {
 /* Header */
 /* Header */
 header {
-    display: grid;
-    grid-template-columns: 44px 1fr auto;
-    /* Changed right col to auto to fit buttons */
-    align-items: center;
-    margin-bottom: 16px;
+    display: block;
+    /* Changed from grid to block for absolute positioning context */
+    position: relative;
+    /* align-items: center; */
+    /* Not needed for block */
+    margin-bottom: 40px;
     width: 100%;
 
     /* Background Image */
@@ -65,8 +66,14 @@ header {
     background-size: cover;
     background-position: center;
     border-radius: var(--radius-lg);
-    padding: 60px 16px;
-    /* Increased padding from ~20px total height to ~120px + content */
+
+    /* Padding to position Title */
+    padding-top: 100px;
+    padding-bottom: 40px;
+    /* Space below title */
+    padding-left: 16px;
+    padding-right: 16px;
+
     box-shadow: var(--shadow-md);
     color: white;
     /* Text color for title */
@@ -76,21 +83,34 @@ header {
 
 h1 {
     font-size: 28px;
-    /* Slightly larger */
     font-weight: 800;
     margin: 0;
     letter-spacing: -0.5px;
     text-align: center;
     white-space: nowrap;
+    /* Ensure H1 is centered */
+    width: 100%;
 }
 
-.header-left,
+.header-left {
+    position: absolute;
+    bottom: -22px;
+    /* Half of 44px button height */
+    left: 20px;
+    z-index: 10;
+}
+
 .header-right {
+    position: absolute;
+    bottom: -22px;
+    /* Half of 44px button height */
+    right: 20px;
+    z-index: 10;
+
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 12px;
-    /* Space between buttons if multiple */
 }
 
 .icon-btn {
@@ -303,7 +323,22 @@ body.dark-mode .icon-btn {
 
 .card-back {
     transform: rotateY(180deg);
+    background-color: var(--card-bg);
+    /* Fixed: Was hardcoded #F9F9FB */
+    position: relative;
+    /* Ensure z-index works if needed */
+}
+
+/* Specific override for light mode if we want a slightly different back color, 
+   but it must be handled via variables or body class */
+body:not(.dark-mode) .card-back {
     background-color: #F9F9FB;
+    /* Keep original light gray for light mode */
+}
+
+body.dark-mode .card-back {
+    background-color: #2C2C2E;
+    /* Slightly lighter than card-bg #1C1C1E for contrast */
 }
 
 .card-header-row {
@@ -603,4 +638,57 @@ body.dark-mode .icon-btn {
 .answer-btn span {
     display: block !important;
     width: 100%;
+}
+
+/* Snippets / Sentence Mode */
+.card-snippets {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+
+/* Sentence Card Specifics */
+.flashcard.sentence-card .card-text {
+    font-size: 22px;
+    /* Smaller font for sentences */
+    line-height: 1.4;
+    margin-bottom: 12px;
+}
+
+.flashcard.sentence-card .card-subtext {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.flashcard.sentence-card .card-phonetic {
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+/* Ensure chips wrap nicely */
+.flashcard.sentence-card .card-snippets {
+    margin-top: 8px;
+    gap: 6px;
+}
+
+.flashcard.sentence-card .snippet-chip {
+    font-size: 0.85em;
+    padding: 4px 10px;
+}
+
+.dark-mode .snippet-chip {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-phonetic {
+    font-size: 16px;
+    color: var(--text-secondary);
+    /* or a distinct color like #007AFF for blue */
+    font-style: italic;
+    margin-top: 4px;
+    margin-bottom: 8px;
 }
